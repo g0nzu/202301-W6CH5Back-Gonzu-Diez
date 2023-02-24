@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import { itemStructure } from "../models/itemType";
 import { ShopFileRepo } from "../repository/shop.file.repo";
 
-export const file = "../../data/data.json";
+export const file = "data/data.json";
 
 export class ShopController {
   constructor(public repo: ShopFileRepo) {}
@@ -15,9 +15,11 @@ export class ShopController {
 
   getByID(req: Request, resp: Response) {
     this.repo.read().then((data) => {
-      console.log(data);
-      const id = req.params.id;
+      const id = Number(req.params.id);
       const findID = data.find((item) => item.id === Number(id));
+      if (findID) {
+        resp.json(findID);
+      }
     });
   }
 
