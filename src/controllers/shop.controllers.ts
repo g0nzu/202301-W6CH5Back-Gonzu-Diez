@@ -20,33 +20,28 @@ export class ShopController {
       if (findID) {
         resp.json(findID);
       }
-    });
-  }
-
-  toDelete(req: Request, resp: Response) {
-    this.repo.read().then((data) => {
-      const id = req.params.id;
-      const name = req.params.name;
-      let itemIndex = -1;
-
-      if (id) {
-        itemIndex = data.findIndex((item) => item.id === Number(id));
-      } else if (name) {
-        itemIndex = data.findIndex(
-          (item) => item.name.toLowerCase() === name.toLowerCase()
-        );
-      }
-
-      if (itemIndex !== -1) {
-        data.splice(itemIndex, 1);
-        this.repo.write(data).then(() => {
-          resp
-            .status(200)
-            .json({ message: "Elemento eliminado correctamente" });
-        });
-      } else {
+      if (!findID) {
         resp.status(404).json({ message: "Elemento no encontrado" });
       }
     });
+  }
+
+  async toDelete(req: Request, resp: Response) {
+    await this.repo.delete(req.params.id);
+    resp.send("Delete was sucessful");
+  }
+
+  async toCreate(req: Request, resp: Response) {
+    const { name, price } = req.body;
+    const newItem = { name, price, id: file.length + 1 };
+    await this.repo.write([newItem]);
+    resp.status(201).json(newItem);
+  }
+
+  async toEdit(req: Request, resp: Response) {
+    const id = req.params.id;
+    const newData = req.body;
+    await this.repo.edit(id, newData);
+    resp.send("Edit was successful");
   }
 }
