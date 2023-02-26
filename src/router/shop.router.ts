@@ -9,3 +9,5 @@ const controller = new ShopController(repo);
 shopRouter.get("/", controller.getAll.bind(controller));
 shopRouter.get("/:id", controller.getByID.bind(controller));
 shopRouter.delete("/:id", controller.toDelete.bind(controller));
+shopRouter.patch("/:id", controller.toEdit.bind(controller));
+shopRouter.post("/", controller.toCreate.bind(controller));

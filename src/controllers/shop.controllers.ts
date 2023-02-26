@@ -7,41 +7,41 @@ export const file = "data/data.json";
 export class ShopController {
   constructor(public repo: ShopFileRepo) {}
 
-  getAll(_req: Request, resp: Response) {
+  getAll(req: Request, res: Response) {
     this.repo.read().then((data) => {
-      resp.json(data);
+      res.send(data);
     });
   }
 
-  getByID(req: Request, resp: Response) {
+  getByID(req: Request, res: Response) {
     this.repo.read().then((data) => {
       const id = Number(req.params.id);
       const findID = data.find((item) => item.id === Number(id));
       if (findID) {
-        resp.json(findID);
+        res.send(findID);
       }
       if (!findID) {
-        resp.status(404).json({ message: "Elemento no encontrado" });
+        res.status(404).json({ message: "Elemento no encontrado" });
       }
     });
   }
 
-  async toDelete(req: Request, resp: Response) {
+  async toDelete(req: Request, res: Response) {
     await this.repo.delete(req.params.id);
-    resp.send("Delete was sucessful");
+    res.send("Delete was sucessful");
   }
 
-  async toCreate(req: Request, resp: Response) {
+  async toCreate(req: Request, res: Response) {
     const { name, price } = req.body;
     const newItem = { name, price, id: file.length + 1 };
     await this.repo.write([newItem]);
-    resp.status(201).json(newItem);
+    res.status(201).json(newItem);
   }
 
-  async toEdit(req: Request, resp: Response) {
+  async toEdit(req: Request, res: Response) {
     const id = req.params.id;
     const newData = req.body;
     await this.repo.edit(id, newData);
-    resp.send("Edit was successful");
+    res.send("Edit was successful");
   }
 }
