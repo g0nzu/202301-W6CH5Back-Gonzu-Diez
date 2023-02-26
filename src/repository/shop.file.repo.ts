@@ -31,6 +31,7 @@ export class ShopFileRepo {
     await fs.writeFile(file, finalFile, "utf-8");
     console.log("Data edited successfully in file:", finalFile);
   }
+
   async delete(id: string) {
     const data = await fs.readFile(file, "utf-8");
     const parseJSON = JSON.parse(data);
