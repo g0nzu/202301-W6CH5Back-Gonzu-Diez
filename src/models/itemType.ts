@@ -1,5 +1,5 @@
 export type itemStructure = {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
 };
