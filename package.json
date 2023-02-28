@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "Node Server",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "cross-env  node ./dist/index.js -w",
-    "start:mon": "cross-env PORT=4200 nodemon ./dist/index.js",
+    "start": "cross-env debug=W7* node ./dist/index.js -w",
+    "start:mon": "cross-env debug=W7* PORT=4200 nodemon ./dist/index.js",
     "build": "tsc -w",
     "build:prod": "tsc",
     "test": "jest --watchAll --coverage",
@@ -19,6 +18,7 @@
   "author": "gonzuwu",
   "license": "ISC",
   "devDependencies": {
+    "@types/debug": "^4.1.7",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.14.0",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
@@ -37,15 +37,17 @@
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/inquirer": "^9.0.3",
+    "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.4",
     "commander": "^10.0.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
+    "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "inquirer": "^9.1.4",
     "jest-ts-webcompat-resolver": "^1.0.0",
+    "mongoose": "^7.0.0",
     "morgan": "^1.10.0"
   }
 }
-
