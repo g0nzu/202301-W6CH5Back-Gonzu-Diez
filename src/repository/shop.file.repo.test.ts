@@ -1,7 +1,7 @@
-import { ShopFileRepo } from './shop.file.repo';
+import { ShopFileRepo } from './shop.file.repo.js';
 import fs from 'fs/promises';
-import { itemStructure } from '../models/itemType';
-import { file } from '../controllers/shop.controllers';
+import { itemStructure } from '../models/itemType.js';
+import { file } from '../controllers/shop.controllers.js';
 jest.mock('fs/promises');
 
 describe('Given ShopFileRepo', () => {
@@ -40,7 +40,7 @@ describe('Given ShopFileRepo', () => {
     describe('When we use the Edit method', () => {
       test('Then it should return the original object if the id is not found', async () => {
         (fs.readFile as jest.Mock).mockResolvedValue(
-          '[{ "id": 1, "name": "milk", "price": 2}]'
+          '[{ "id": 2, "name": "milk", "price": 2}]'
         );
         const result = await repo.edit(2, {
           id: 2,

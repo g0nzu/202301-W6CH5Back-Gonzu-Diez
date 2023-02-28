@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Node Server",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "cross-env debug=W7* node ./dist/index.js -w",
     "start:mon": "cross-env debug=W7* PORT=4200 nodemon ./dist/index.js",

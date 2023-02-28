@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
-import { itemStructure } from '../models/itemType';
-import { ShopFileRepo } from '../repository/shop.file.repo';
+import { itemStructure } from '../models/itemType.js';
+import { ShopFileRepo } from '../repository/shop.file.repo.js';
 
 export const file = 'data/data.json';
 
@@ -24,7 +24,7 @@ export class ShopController {
       const id = Number(req.params.id);
       const findID = data.find((item) => item.id === Number(id));
       if (findID) {
-        res.send(findID);
+        res.json(findID);
       } else {
         res.status(404).json({ message: 'Elemento no encontrado' });
       }
@@ -36,7 +36,7 @@ export class ShopController {
   async toDelete(req: Request, res: Response, next: NextFunction) {
     try {
       await this.repo.delete(Number(req.params.id));
-      res.send('Delete was successful');
+      res.json('Delete was successful');
     } catch (error) {
       next(error);
     }

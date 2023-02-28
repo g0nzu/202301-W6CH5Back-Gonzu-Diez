@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import { itemStructure } from '../models/itemType';
 const file = 'data/data.json';
-import { Repo } from './repo.interface';
+import { Repo } from './repo.interface.js';
 
 export class ShopFileRepo {
   read() {

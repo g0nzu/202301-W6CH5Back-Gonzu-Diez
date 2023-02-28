@@ -63,7 +63,7 @@ describe('Given ShopController', () => {
       const error = new Error('Write error');
       (repo.write as jest.Mock).mockRejectedValue(error);
       await controller.toCreate(req, resp, next);
-      expect(next).toHaveBeenCalledWith(error);
+      expect(next).toHaveBeenCalledWith(error as Error);
     });
   });
 
