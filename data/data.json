@@ -1,5 +1,5 @@
 [
-  { "id": 0, "name": "milk", "price": 2 },
+  { "id": 0, "name": "milk", "price": 4 },
   { "id": 1, "name": "cheese", "price": 1 },
   { "id": 2, "name": "water", "price": 1 },
   { "id": 3, "name": "coffee", "price": 4 },
