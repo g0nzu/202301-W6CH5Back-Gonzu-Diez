@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { shopRouter } from './routers/shop.router.js';
 import createDebug from 'debug';
 import { CustomError } from './errors/error.js';
+import { UsersRouter } from './routers/users.router.js';
 const debug = createDebug('W6:app');
 export const app = express();
 app.disable('x-powered-by');
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.use('/shop', shopRouter);
+app.use('/users', UsersRouter);
 
 app.use(
   (error: CustomError, _req: Request, resp: Response, _next: NextFunction) => {

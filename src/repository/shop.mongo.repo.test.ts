@@ -1,4 +1,4 @@
-import { itemStructure } from '../models/itemType';
+import { itemStructure } from '../entities/itemType';
 import { ItemModel } from './shop.mongo.models';
 import { ShopMongoRepo } from './shop.mongo.repo';
 
@@ -30,26 +30,26 @@ describe('Given the Mongo repo', () => {
         price: 1.5,
       };
       (ItemModel.create as jest.Mock).mockResolvedValue(newItem);
-      const result = await repo.write(newItem as itemStructure);
+      const result = await repo.create(newItem as itemStructure);
       expect(ItemModel.create).toHaveBeenCalled();
       expect(result).toStrictEqual(newItem);
     });
   });
 
-  describe('When the update method is used', () => {
+  describe('When the edit method is used', () => {
     beforeEach(async () => {
       (ItemModel.findByIdAndUpdate as jest.Mock).mockResolvedValue({
         id: '2',
       });
     });
 
-    test('Then if it has an object to update, it should return the updated object', async () => {
+    test('Then if it has an object to edit, it should return the updated object', async () => {
       const itemMock = {
         id: '2',
         name: 'test',
       } as Partial<itemStructure>;
 
-      const result = await repo.update(itemMock);
+      const result = await repo.edit(itemMock);
       expect(ItemModel.find).toHaveBeenCalled();
       expect(result).toEqual({ id: '2' });
     });

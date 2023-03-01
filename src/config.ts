@@ -5,4 +5,5 @@ export const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   cluster: process.env.DB_CLUSTER,
+  jwtSecret: process.env.SECRET,
 };
