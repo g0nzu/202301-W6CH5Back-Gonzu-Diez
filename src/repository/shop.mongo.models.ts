@@ -1,16 +1,22 @@
 import { model, Schema } from 'mongoose';
-import { SchemaTypes } from 'mongoose';
-import { itemStructure } from '../models/itemType.js';
+import { itemStructure } from '../entities/itemType.js';
 
 const shopSchema = new Schema<itemStructure>({
   name: {
-    type: SchemaTypes.String,
+    type: String,
     require: false,
   },
   price: {
-    type: SchemaTypes.Number,
+    type: Number,
     min: 0,
   },
 });
 
-export const ItemModel = model('Item', shopSchema);
+shopSchema.set('toJSON', {
+  transform(_document, returnedObject) {
+    delete returnedObject.__v;
+    delete returnedObject.id;
+  },
+});
+
+export const ItemModel = model('Item', shopSchema, 'Items');

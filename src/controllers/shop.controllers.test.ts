@@ -5,9 +5,10 @@ import { ShopFileRepo } from '../repository/shop.file.repo';
 describe('Given ShopController', () => {
   const repo: ShopFileRepo = {
     read: jest.fn(),
-    write: jest.fn(),
+    create: jest.fn(),
     edit: jest.fn(),
     delete: jest.fn(),
+    search: jest.fn(),
   };
 
   const req = {
@@ -19,6 +20,7 @@ describe('Given ShopController', () => {
     json: jest.fn(),
   } as unknown as Response;
   const next = jest.fn();
+
   const controller = new ShopController(repo);
 
   describe('When we try to use the getAll method', () => {
@@ -54,22 +56,22 @@ describe('Given ShopController', () => {
 
   describe('When we try to use the toCreate method', () => {
     test('Then, it should create a new one', async () => {
-      await controller.toCreate(req, resp, next);
-      expect(repo.write).toHaveBeenCalled();
+      await controller.write(req, resp, next);
+      expect(repo.create).toHaveBeenCalled();
       expect(resp.json).toHaveBeenCalled();
     });
 
     test('Then, it should call next with an error when write method fails', async () => {
       const error = new Error('Write error');
-      (repo.write as jest.Mock).mockRejectedValue(error);
-      await controller.toCreate(req, resp, next);
+      (repo.create as jest.Mock).mockRejectedValue(error);
+      await controller.write(req, resp, next);
       expect(next).toHaveBeenCalledWith(error as Error);
     });
   });
 
   describe('When we try to use the toEdit method', () => {
     test('Then, it should edit without errors', async () => {
-      await controller.toEdit(req, resp, next);
+      await controller.edit(req, resp, next);
       expect(repo.edit).toHaveBeenCalled();
       expect(resp.json).toHaveBeenCalled();
     });
@@ -77,7 +79,7 @@ describe('Given ShopController', () => {
     test('Then, it should call next with an error when edit method fails', async () => {
       const error = new Error('Edit error');
       (repo.edit as jest.Mock).mockRejectedValue(error);
-      await controller.toEdit(req, resp, next);
+      await controller.edit(req, resp, next);
       expect(next).toHaveBeenCalledWith(error);
     });
   });

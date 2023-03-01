@@ -1,11 +1,11 @@
 import { Response, Request, NextFunction } from 'express';
-import { itemStructure } from '../models/itemType.js';
-import { ShopFileRepo } from '../repository/shop.file.repo.js';
+import { itemStructure } from '../entities/itemType.js';
+import { Repo } from '../repository/repo.interface.js';
 
 export const file = 'data/data.json';
 
 export class ShopController {
-  constructor(public repo: ShopFileRepo) {
+  constructor(public repo: Repo<itemStructure>) {
     this.repo = repo;
   }
 
@@ -33,33 +33,35 @@ export class ShopController {
     }
   }
 
-  async toDelete(req: Request, res: Response, next: NextFunction) {
+  async toDelete(req: Request, resp: Response, next: NextFunction) {
     try {
-      await this.repo.delete(Number(req.params.id));
-      res.json('Delete was successful');
+      await this.repo.delete(req.params.id);
+      resp.json({
+        results: [],
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async toCreate(req: Request, res: Response, next: NextFunction) {
+  async write(req: Request, resp: Response, next: NextFunction) {
     try {
-      const { name, price } = req.body;
-      const data = await this.repo.read();
-      const newItem = { name, price, id: data.length + 1 };
-      await this.repo.write([...data, newItem]);
-      res.status(201).json(newItem);
+      const data = await this.repo.create(req.body);
+      resp.json({
+        results: [data],
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async toEdit(req: Request, res: Response, next: NextFunction) {
+  async edit(req: Request, resp: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      const newData = req.body;
-      await this.repo.edit(id, newData);
-      res.send('Edit was successful');
+      req.body.id = req.params.id ? req.params.id : req.body.id;
+      const data = await this.repo.edit(req.body);
+      resp.json({
+        results: [data],
+      });
     } catch (error) {
       next(error);
     }

@@ -1,27 +1,27 @@
 import { Repo } from './repo.interface';
-import { itemStructure } from '../models/itemType.js';
-import { ItemModel } from './shop.mongo.models';
-import { CustomError, HTTPError } from '../errors/error';
+import { itemStructure } from '../entities/itemType.js';
+import { ItemModel } from './shop.mongo.models.js';
+import { CustomError, HTTPError } from '../errors/error.js';
+import debug from 'debug';
 
 export class ShopMongoRepo implements Repo<itemStructure> {
-  edit(
-    _data: Partial<itemStructure>,
-    _newData: Partial<itemStructure>
-  ): Promise<itemStructure> {
-    throw new Error('Method not implemented.');
-  }
-
-  async read(): Promise<itemStructure[]> {
-    const data: itemStructure[] = await ItemModel.find();
+  async search(query: { key: string; value: unknown }) {
+    debug('search');
+    const data = ItemModel.find({ [query.key]: query.value });
     return data;
   }
 
-  async write(data: Partial<itemStructure>): Promise<itemStructure> {
+  async read(): Promise<itemStructure[]> {
+    const data = await ItemModel.find();
+    return data;
+  }
+
+  async create(data: Partial<itemStructure>): Promise<itemStructure> {
     const info = await ItemModel.create(data);
     return info;
   }
 
-  async update(info: Partial<itemStructure>): Promise<itemStructure> {
+  async edit(info: Partial<itemStructure>): Promise<itemStructure> {
     const data = await ItemModel.findByIdAndUpdate(info.id, info, {
       new: true,
     });
@@ -33,4 +33,3 @@ export class ShopMongoRepo implements Repo<itemStructure> {
     const data = await ItemModel.findByIdAndDelete(id);
   }
 }
-export { ItemModel };
