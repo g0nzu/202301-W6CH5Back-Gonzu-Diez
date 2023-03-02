@@ -1,37 +1,50 @@
-import { Response, Request, NextFunction } from 'express';
-import { ShopFileRepo } from '../repository/shop.file.repo';
-import { ShopController } from './shop.controllers';
-import { UserMongoRepo } from '../repository/user.mongo.repo';
+/* eslint-disable @typescript-eslint/ban-types */
+import { Response, Request } from 'express';
 
-describe('Given ShopController', () => {
-  const repo: ShopFileRepo = {
+import { Document, Types } from 'mongoose';
+import { RequestPlus } from '../interceptors/logged';
+import { itemStructure } from '../entities/itemType';
+import { ShopMongoRepo } from '../repository/shop.mongo.repo';
+import { UserMongoRepo } from '../repository/user.mongo.repo';
+import { ShopController } from './shop.controllers';
+
+describe('Given ThingsController', () => {
+  const repo: ShopMongoRepo = {
     create: jest.fn(),
     read: jest.fn(),
     queryId: jest.fn(),
     edit: jest.fn(),
     delete: jest.fn(),
-    search: jest.fn(),
+
+    search(_query: {
+      key: string;
+      value: unknown;
+    }): Promise<
+      (Document<unknown, {}, itemStructure> &
+        Omit<itemStructure & { _id: Types.ObjectId }, never>)[]
+    > {
+      throw new Error('Function not implemented.');
+    },
   };
 
-  const userRepo = {
+  const repoUsers: UserMongoRepo = {
     create: jest.fn(),
     read: jest.fn(),
+    search: jest.fn(),
     queryId: jest.fn(),
     edit: jest.fn(),
     delete: jest.fn(),
-    search: jest.fn(),
-  } as UserMongoRepo;
-
+  };
   const req = {
     body: {},
     params: { id: '' },
-  } as unknown as Request;
+  } as unknown as RequestPlus;
   const resp = {
     json: jest.fn(),
   } as unknown as Response;
   const next = jest.fn();
 
-  const controller = new ShopController(repo, userRepo);
+  const controller = new ShopController(repo, repoUsers);
 
   describe('when we use getAll', () => {
     test('Then it should ... if there ara NOT errors', async () => {
@@ -74,17 +87,20 @@ describe('Given ShopController', () => {
       await controller.create(req, resp, next);
       expect(next).toHaveBeenCalled();
     });
-    test('If everything is ok it should create', async () => {
-      const newID = '2';
+    describe('When userId has value', () => {
+      test('Then if everying is OK', async () => {
+        const req = {
+          body: {
+            id: '1',
+          },
+          info: { id: '1' },
+        } as unknown as Request;
 
-      const req = {
-        body: { owner: '2' },
-        info: {
-          id: newID,
-        },
-      } as unknown as Request;
-      await controller.create(req, resp, next);
-      expect(resp.json).toHaveBeenCalled();
+        (repoUsers.queryId as jest.Mock).mockResolvedValue({ Item: [] });
+
+        await controller.create(req, resp, next);
+        expect(resp.json).toHaveBeenCalled();
+      });
     });
   });
 
@@ -109,7 +125,7 @@ describe('Given ShopController', () => {
       expect(resp.json).toHaveBeenCalled();
     });
     test('Then it should ... if there are errors', async () => {
-      (repo.delete as jest.Mock).mockRejectedValue(new Error());
+      (repo.delete as jest.Mock).mockRejectedValue(undefined);
       expect(repo.delete).toHaveBeenCalled();
       expect(next).toHaveBeenCalled();
     });
