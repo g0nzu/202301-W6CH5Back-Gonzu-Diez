@@ -32,4 +32,11 @@ export class UserMongoRepo implements Repo<User> {
     const data = await UserModel.find({ [query.key]: query.value });
     return data;
   }
+
+  async queryId(id: string): Promise<User> {
+    debug('queryId');
+    const data = await UserModel.findById(id);
+    if (!data) throw new HTTPError(404, 'Not found', 'Id not found in queryId');
+    return data;
+  }
 }

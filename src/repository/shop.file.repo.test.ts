@@ -50,6 +50,12 @@ describe('Given ShopFileRepo', () => {
         id: 2,
         name: 'eggs',
         price: 1.5,
+        owner: {
+          id: '',
+          email: '',
+          passwd: '',
+          items: [],
+        },
       };
       (fs.readFile as jest.Mock).mockResolvedValue('[]');
 

@@ -1,24 +1,30 @@
 import { Response, Request, NextFunction } from 'express';
 import { itemStructure } from '../entities/itemType.js';
+import { User } from '../entities/user.js';
+import { HTTPError } from '../errors/error.js';
+import { RequestPlus } from '../interceptors/logged.js';
 import { Repo } from '../repository/repo.interface.js';
 
 export const file = 'data/data.json';
 
 export class ShopController {
-  constructor(public repo: Repo<itemStructure>) {
+  constructor(public repo: Repo<itemStructure>, public repoUsers: Repo<User>) {
     this.repo = repo;
+    this.repoUsers = repoUsers;
   }
 
-  async getAll(req: Request, resp: Response, next: NextFunction) {
+  async read(req: Request, resp: Response, next: NextFunction) {
     try {
       const data = await this.repo.read();
-      resp.json(data);
+      resp.json({
+        result: data,
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async getByID(req: Request, res: Response, next: NextFunction) {
+  async queryId(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await this.repo.read();
       const id = Number(req.params.id);
@@ -33,7 +39,7 @@ export class ShopController {
     }
   }
 
-  async toDelete(req: Request, resp: Response, next: NextFunction) {
+  async delete(req: Request, resp: Response, next: NextFunction) {
     try {
       await this.repo.delete(req.params.id);
       resp.json({
@@ -44,11 +50,21 @@ export class ShopController {
     }
   }
 
-  async write(req: Request, resp: Response, next: NextFunction) {
+  async create(req: RequestPlus, resp: Response, next: NextFunction) {
     try {
-      const data = await this.repo.create(req.body);
+      const userId = req.info?.id;
+
+      if (!userId) throw new HTTPError(404, 'Not found', 'User ID not found');
+      const actualUser = await this.repoUsers.queryId(userId);
+
+      req.body.owner = userId;
+      const newThing = await this.repo.create(req.body);
+
+      actualUser.items.push(newThing);
+      this.repoUsers.edit(actualUser);
+
       resp.json({
-        results: [data],
+        results: [newThing],
       });
     } catch (error) {
       next(error);

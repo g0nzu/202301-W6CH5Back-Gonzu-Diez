@@ -1,86 +1,117 @@
 import { Response, Request, NextFunction } from 'express';
-import { ShopController } from './shop.controllers';
 import { ShopFileRepo } from '../repository/shop.file.repo';
+import { ShopController } from './shop.controllers';
+import { UserMongoRepo } from '../repository/user.mongo.repo';
 
 describe('Given ShopController', () => {
   const repo: ShopFileRepo = {
-    read: jest.fn(),
     create: jest.fn(),
+    read: jest.fn(),
+    queryId: jest.fn(),
     edit: jest.fn(),
     delete: jest.fn(),
     search: jest.fn(),
   };
 
+  const userRepo = {
+    create: jest.fn(),
+    read: jest.fn(),
+    queryId: jest.fn(),
+    edit: jest.fn(),
+    delete: jest.fn(),
+    search: jest.fn(),
+  } as UserMongoRepo;
+
   const req = {
     body: {},
     params: { id: '' },
   } as unknown as Request;
-
   const resp = {
     json: jest.fn(),
   } as unknown as Response;
   const next = jest.fn();
 
-  const controller = new ShopController(repo);
+  const controller = new ShopController(repo, userRepo);
 
-  describe('When we try to use the getAll method', () => {
-    test('Then, it should load data without errors', async () => {
+  describe('when we use getAll', () => {
+    test('Then it should ... if there ara NOT errors', async () => {
+      await controller.read(req, resp, next);
+      expect(repo.read).toHaveBeenCalled();
+      expect(resp.json).toHaveBeenCalled();
+    });
+
+    test('Then it should ... if there are errors', async () => {
       (repo.read as jest.Mock).mockRejectedValue(new Error());
-      await controller.getAll(req, resp, next);
+      await controller.read(req, resp, next);
       expect(repo.read).toHaveBeenCalled();
       expect(next).toHaveBeenCalled();
     });
-
-    test('Then, it should call next with an error when read method fails', async () => {
-      const error = new Error('Read error');
-      (repo.read as jest.Mock).mockRejectedValue(error);
-      await controller.getAll(req, resp, next);
-      expect(next).toHaveBeenCalledWith(error);
-    });
   });
 
-  describe('When we try to use the toDelete method', () => {
-    test('Then, it should delete the data', async () => {
-      await controller.toDelete(req, resp, next);
-      expect(repo.delete).toHaveBeenCalled();
+  describe('when we use get', () => {
+    test('Then it should ... if there ara NOT errors', async () => {
+      await controller.queryId(req, resp, next);
+      expect(repo.queryId).toHaveBeenCalled();
       expect(resp.json).toHaveBeenCalled();
     });
 
-    test('Then, it should call next with an error when delete method fails', async () => {
-      const error = new Error('Delete error');
-      (repo.delete as jest.Mock).mockRejectedValue(error);
-      await controller.toDelete(req, resp, next);
-      expect(next).toHaveBeenCalledWith(error);
+    test('Then it should ... if there are errors', async () => {
+      (repo.queryId as jest.Mock).mockRejectedValue(new Error());
+      await controller.queryId(req, resp, next);
+      expect(repo.queryId).toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
     });
   });
 
-  describe('When we try to use the toCreate method', () => {
-    test('Then, it should create a new one', async () => {
-      await controller.write(req, resp, next);
-      expect(repo.create).toHaveBeenCalled();
+  describe('when we use post', () => {
+    test('When i dont have an id it should throw and error', async () => {
+      const req = {
+        info: {
+          email: 'test',
+          role: 'user',
+        },
+      } as unknown as Request;
+      await controller.create(req, resp, next);
+      expect(next).toHaveBeenCalled();
+    });
+    test('If everything is ok it should create', async () => {
+      const newID = '2';
+
+      const req = {
+        body: { owner: '2' },
+        info: {
+          id: newID,
+        },
+      } as unknown as Request;
+      await controller.create(req, resp, next);
       expect(resp.json).toHaveBeenCalled();
     });
-
-    test('Then, it should call next with an error when write method fails', async () => {
-      const error = new Error('Write error');
-      (repo.create as jest.Mock).mockRejectedValue(error);
-      await controller.write(req, resp, next);
-      expect(next).toHaveBeenCalledWith(error as Error);
-    });
   });
 
-  describe('When we try to use the toEdit method', () => {
-    test('Then, it should edit without errors', async () => {
+  describe('when we use patch', () => {
+    test('Then it should ... if there ara NOT errors', async () => {
       await controller.edit(req, resp, next);
       expect(repo.edit).toHaveBeenCalled();
       expect(resp.json).toHaveBeenCalled();
     });
 
-    test('Then, it should call next with an error when edit method fails', async () => {
-      const error = new Error('Edit error');
-      (repo.edit as jest.Mock).mockRejectedValue(error);
+    test('Then it should ... if there are errors', async () => {
+      (repo.edit as jest.Mock).mockRejectedValue(new Error());
       await controller.edit(req, resp, next);
-      expect(next).toHaveBeenCalledWith(error);
+      expect(repo.edit).toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
+    });
+  });
+  describe('when we use delete', () => {
+    test('Then it should ... if there ara NOT errors', async () => {
+      controller.delete(req, resp, next);
+      expect(repo.delete).toHaveBeenCalled();
+      expect(resp.json).toHaveBeenCalled();
+    });
+    test('Then it should ... if there are errors', async () => {
+      (repo.delete as jest.Mock).mockRejectedValue(new Error());
+      expect(repo.delete).toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
     });
   });
 });

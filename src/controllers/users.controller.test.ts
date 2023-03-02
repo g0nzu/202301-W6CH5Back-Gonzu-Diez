@@ -1,68 +1,112 @@
 import { Response } from 'express';
 import { Request } from 'express';
-import { NextFunction } from 'express';
 import { UsersController } from './users.controller';
-import { UserMongoRepo } from '../repository/user.mongo.repo';
+import { Repo } from '../repository/repo.interface';
+import { User } from '../entities/user';
 import Auth from '../services/auth';
+import { NextFunction } from 'express';
+import { UserMongoRepo } from '../repository/user.mongo.repo';
 import { TokenPayLoad } from '../services/auth';
 
 jest.mock('../services/auth');
 
-describe('Given the Users Controller', () => {
-  const repo: UserMongoRepo = {
-    read: jest.fn(),
+describe('Given the register method', () => {
+  const mockRepo = {
     create: jest.fn(),
-    edit: jest.fn(),
-    delete: jest.fn(),
     search: jest.fn(),
-  };
+  } as unknown as Repo<User>;
 
-  const AuthMock: Auth = {
-    toHash: jest.fn(),
-    toUnHash: jest.fn(),
-    createJWT: jest.fn(),
-  };
+  const repoUsers = {} as UserMongoRepo;
+
+  const controller = new UsersController(mockRepo);
+
+  const resp = {
+    status: jest.fn(),
+    json: jest.fn(),
+  } as unknown as Response;
+
+  const next = jest.fn();
+
+  describe('When there is no password & email in the body', () => {
+    test('Next from express should has been called', async () => {
+      const req = {
+        body: {},
+      } as Request;
+
+      await controller.register(req, resp, next);
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe('When there is no password in the body', () => {
+    test('Next from express should has been called', async () => {
+      const req = {
+        body: {
+          passwd: 'root',
+        },
+      } as Request;
+
+      await controller.register(req, resp, next);
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe('When there is no email in the body', () => {
+    test('Next from express should has been called', async () => {
+      const req = {
+        body: {
+          email: 'paco',
+        },
+      } as Request;
+
+      await controller.register(req, resp, next);
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe('When there are a password in the body', () => {
+    const req = {
+      body: {
+        email: 'test',
+        passwd: 'test',
+      },
+    } as Request;
+    test('The data should be returned as JSON', async () => {
+      await controller.register(req, resp, next);
+      expect(resp.json).toHaveBeenCalled();
+    });
+  });
+});
+
+describe('Given login method from UsersController', () => {
+  const mockRepo = {
+    create: jest.fn(),
+    search: jest.fn(),
+  } as unknown as Repo<User>;
+
+  const controller = new UsersController(mockRepo);
+
+  const resp = {
+    status: jest.fn(),
+    json: jest.fn(),
+  } as unknown as Response;
 
   const req = {
     body: {
       email: 'test',
-      password: 'test',
+      passwd: 'test',
     },
-  } as unknown as Request;
+  } as Request;
 
-  const resp = {
-    json: jest.fn(),
-    status: jest.fn(),
-  } as unknown as Response;
+  const next = jest.fn();
 
-  const next = jest.fn() as unknown as NextFunction;
+  Auth.toUnHash = jest.fn().mockResolvedValue(true);
 
-  const controller = new UsersController(repo);
-
-  describe('When we use the register method', () => {
-    test('It should allow the user to register', async () => {
-      await controller.register(req, resp, next);
-      expect(repo.create).toHaveBeenCalled();
-      expect(resp.status).toHaveBeenCalled();
+  describe('When ALL is OK', () => {
+    (mockRepo.search as jest.Mock).mockResolvedValue(['test']);
+    test('Then json should be called', async () => {
+      await controller.login(req, resp, next);
       expect(resp.json).toHaveBeenCalled();
-    });
-  });
-
-  describe('When the Login method is called', () => {
-    test('Then, if the login credentials are correct, it should return the token', () => {
-      const mockPayload: TokenPayLoad = {
-        email: 'paco@gmail.com',
-        role: 'root',
-      };
-      const value = 'test';
-      const hash = 'test';
-      req.body.email = 'test';
-      req.body.password = 'test';
-      expect(repo.search).toHaveBeenCalled();
-      expect(resp.status).toHaveBeenCalled();
-      expect(resp.json).toHaveBeenCalled();
-      expect(Auth.createJWT(mockPayload)).toHaveBeenCalled();
-      expect(Auth.toUnHash(value, hash)).toHaveBeenCalled();
     });
   });
 });

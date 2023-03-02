@@ -1,6 +1,7 @@
 import debug from 'debug';
 import fs from 'fs/promises';
 import { itemStructure } from '../entities/itemType';
+import { HTTPError } from '../errors/error';
 import { Repo } from './repo.interface';
 import { ItemModel } from './shop.mongo.models';
 const file = 'data/data.json';
@@ -9,6 +10,14 @@ export class ShopFileRepo implements Repo<itemStructure> {
   async read(): Promise<itemStructure[]> {
     const data = await ItemModel.find();
     return data;
+  }
+
+  async queryId(id: string): Promise<itemStructure> {
+    const initialData: string = await fs.readFile(file, { encoding: 'utf-8' });
+    const data: itemStructure[] = JSON.parse(initialData);
+    const finalData = data.find((item) => item.id === id);
+    if (!finalData) throw new Error('Id not found');
+    return finalData;
   }
 
   async create(info: Partial<itemStructure>): Promise<itemStructure> {
