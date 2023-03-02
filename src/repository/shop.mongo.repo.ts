@@ -7,7 +7,14 @@ import debug from 'debug';
 export class ShopMongoRepo implements Repo<itemStructure> {
   async search(query: { key: string; value: unknown }) {
     debug('search');
-    const data = ItemModel.find({ [query.key]: query.value });
+    const data = await ItemModel.find().populate('owner', { things: 0 });
+    return data;
+  }
+
+  async queryId(id: string): Promise<itemStructure> {
+    debug('queryId');
+    const data = await ItemModel.findById(id);
+    if (!data) throw new HTTPError(404, 'Not found', 'Id not found in queryId');
     return data;
   }
 

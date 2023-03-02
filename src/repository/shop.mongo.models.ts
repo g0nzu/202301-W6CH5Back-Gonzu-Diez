@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, SchemaType } from 'mongoose';
 import { itemStructure } from '../entities/itemType.js';
 
 const shopSchema = new Schema<itemStructure>({
@@ -9,6 +9,10 @@ const shopSchema = new Schema<itemStructure>({
   price: {
     type: Number,
     min: 0,
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
 });
 

@@ -1,5 +1,6 @@
 export interface Repo<T> {
   read(): Promise<T[]>;
+  queryId(_id: string): Promise<T>;
   create(_data: Partial<T>): Promise<T>;
   search(query: { key: string; value: unknown }): Promise<T[]>;
   edit(_data: Partial<T>): Promise<T>;

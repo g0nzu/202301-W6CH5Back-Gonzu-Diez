@@ -11,6 +11,12 @@ const userSchema = new Schema<User>({
     type: String,
     required: true,
   },
+  items: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'item',
+    },
+  ],
 });
 
 userSchema.set('toJSON', {

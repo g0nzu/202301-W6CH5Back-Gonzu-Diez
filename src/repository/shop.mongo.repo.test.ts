@@ -28,6 +28,12 @@ describe('Given the Mongo repo', () => {
         id: 2,
         name: 'eggs',
         price: 1.5,
+        owner: {
+          id: '',
+          email: '',
+          passwd: '',
+          items: [],
+        },
       };
       (ItemModel.create as jest.Mock).mockResolvedValue(newItem);
       const result = await repo.create(newItem as itemStructure);

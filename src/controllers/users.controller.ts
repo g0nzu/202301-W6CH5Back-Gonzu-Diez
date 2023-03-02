@@ -16,6 +16,7 @@ export class UsersController {
       if (!req.body.email || !req.body.passwd)
         throw new HTTPError(401, 'Unauthorized', 'Invalid Email or password');
       req.body.passwd = await Auth.toHash(req.body.passwd);
+      req.body.items = [];
       const data = await this.repo.create(req.body);
       console.log(data);
       resp.status(201);
@@ -41,6 +42,7 @@ export class UsersController {
       if (!(await Auth.toUnHash(req.body.passwd, data[0].passwd)))
         throw new HTTPError(401, 'Unauthorized', 'Password not match');
       const payload: TokenPayLoad = {
+        id: data[0].id,
         email: data[0].email,
         role: 'admin',
       };

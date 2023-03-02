@@ -47,6 +47,7 @@ describe('Given the Mongo repo', () => {
         id: '2',
         email: 'paco@gmail.com',
         passwd: '22',
+        items: [],
       };
       (UserModel.create as jest.Mock).mockResolvedValue(newItem);
       const result = await repo.create(newItem as User);
